@@ -227,7 +227,7 @@ public class GameController : MonoBehaviour
     {
         var itemsMessage = "Items breakdown:\n";
         foreach (var item in _items)
-            itemsMessage += $"{item.name}    ${item.value}    {item.DurabilityPercentage}%\n";
+            itemsMessage += $"{item.name}  -  ${item.value}  -  {item.ConditionPercentage}%  {(item.IsPacked ? "-  Packed" : "")}\n";
         _itemsText.SetText(itemsMessage);
 
         PostProcessingController.Instance.SetDepthOfField(true);
@@ -249,7 +249,7 @@ public class GameController : MonoBehaviour
         var score = _truck.TotalValue / _maxValue;
         for (var i = 0; i < 5; i++)
         {
-            _stars[i].gameObject.SetActive(score > (i / 5f));
+            _stars[i].gameObject.SetActive(score >= ((i + 1) / 5f));
         }
     }
 }

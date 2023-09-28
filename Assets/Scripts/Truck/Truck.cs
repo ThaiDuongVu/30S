@@ -26,6 +26,7 @@ public class Truck : MonoBehaviour
         {
             var item = other.GetComponent<Item>();
             _items.Add(item);
+            item.IsPacked = true;
 
             var text = Instantiate(popTextPrefab, item.transform.position, Quaternion.identity);
             text.SetText($"${item.value}");
@@ -41,6 +42,7 @@ public class Truck : MonoBehaviour
         if (other.CompareTag("Item"))
         {
             var item = other.GetComponent<Item>();
+            item.IsPacked = false;
             if (_items.Contains(item)) _items.Remove(item);
 
             var text = Instantiate(popTextPrefab, item.transform.position, Quaternion.identity);

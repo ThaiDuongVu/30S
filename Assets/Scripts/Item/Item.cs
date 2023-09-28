@@ -15,8 +15,10 @@ public class Item : MonoBehaviour
     [SerializeField] private ParticleSystem explosionPrefab;
     [SerializeField] private PopText damageTextPrefab;
 
-    private float _currentDurability;
-    public float DurabilityPercentage => (int)(_currentDurability / baseDurability * 100f);
+    private float _currentCondition;
+    public float ConditionPercentage => (int)(_currentCondition / baseDurability * 100f);
+
+    public bool IsPacked { get; set; }
 
     private DistanceJoint2D _distanceJoint;
     private Rigidbody2D _rigidbody;
@@ -32,7 +34,7 @@ public class Item : MonoBehaviour
     private void Start()
     {
         spriteLight.enabled = false;
-        _currentDurability = baseDurability;
+        _currentCondition = baseDurability;
 
         SetHighlight(false);
         SetJointBody(null);
@@ -53,7 +55,7 @@ public class Item : MonoBehaviour
 
     private void TakeDamage(float damage, Vector2 contactPoint)
     {
-        _currentDurability -= damage;
+        _currentCondition -= damage;
 
         if (damage > 10f)
         {
@@ -64,7 +66,7 @@ public class Item : MonoBehaviour
         }
 
         // Item explode after taking too much damage
-        if (_currentDurability <= 0f) Explode();
+        if (_currentCondition <= 0f) Explode();
     }
 
     private void Explode()
