@@ -39,11 +39,15 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private TMP_Text gameCountdownText;
 
+    [SerializeField] private GameObject itemsDisplay;
+    private TMP_Text _itemsText;
+
     [Header("Stats")]
     [SerializeField] private float startGameCountdown;
     [SerializeField] private float endGameCountdown;
 
     private Truck _truck;
+    private Item[] _items;
     private float _maxValue;
 
     private InputManager _inputManager;
@@ -54,8 +58,10 @@ public class GameController : MonoBehaviour
     {
         _inputManager = new InputManager();
 
-        // Handle game pause input
+        // Handle game inputs
         _inputManager.Game.Escape.performed += EscapeOnPerformed;
+        _inputManager.Game.Tab.performed += TabOnPerformed;
+        _inputManager.Game.Tab.canceled += TabOnCanceled;
 
         _inputManager.Enable();
     }
@@ -70,9 +76,11 @@ public class GameController : MonoBehaviour
         _startGameText = startGameDisplay.GetComponentInChildren<TMP_Text>();
         _endGameText = endGameDisplay.GetComponentInChildren<TMP_Text>();
         _stars = endGameStars.GetComponentsInChildren<Image>();
+        _itemsText = itemsDisplay.GetComponentInChildren<TMP_Text>();
 
         _truck = FindObjectOfType<Truck>();
-        foreach (var item in FindObjectsOfType<Item>()) _maxValue += item.value;
+        _items = FindObjectsOfType<Item>();
+        foreach (var item in _items) _maxValue += item.value;
     }
 
     private void Start()
@@ -91,6 +99,8 @@ public class GameController : MonoBehaviour
 
         startGameDisplay.SetActive(true);
         endGameDisplay.SetActive(false);
+
+        itemsDisplay.SetActive(false);
 
         _startGameTimer = new Timer(startGameCountdown);
         _endGameTimer = new Timer(endGameCountdown);
@@ -119,6 +129,22 @@ public class GameController : MonoBehaviour
     private void EscapeOnPerformed(InputAction.CallbackContext context)
     {
         InputTypeController.Instance.CheckInputType(context);
+    }
+
+    private void TabOnPerformed(InputAction.CallbackContext context)
+    {
+        InputTypeController.Instance.CheckInputType(context);
+
+        if (State != GameState.InProgress) return;
+        ShowItemsDisplay();
+    }
+
+    private void TabOnCanceled(InputAction.CallbackContext context)
+    {
+        InputTypeController.Instance.CheckInputType(context);
+
+        if (State != GameState.InProgress) return;
+        HideItemsDisplay();
     }
 
     #endregion
@@ -192,7 +218,30 @@ public class GameController : MonoBehaviour
         // Update ranking
         RankLevel();
     }
-    
+
+    #endregion
+
+    #region Items Display Methods
+
+    private void ShowItemsDisplay()
+    {
+        var itemsMessage = "Items breakdown:\n";
+        foreach (var item in _items)
+            itemsMessage += $"{item.name}    ${item.value}    {item.DurabilityPercentage}%\n";
+        _itemsText.SetText(itemsMessage);
+
+        PostProcessingController.Instance.SetDepthOfField(true);
+        SetTimeScale(0f);
+        itemsDisplay.SetActive(true);
+    }
+
+    private void HideItemsDisplay()
+    {
+        PostProcessingController.Instance.SetDepthOfField(false);
+        SetTimeScale(1f);
+        itemsDisplay.SetActive(false);
+    }
+
     #endregion
 
     private void RankLevel()
@@ -200,7 +249,7 @@ public class GameController : MonoBehaviour
         var score = _truck.TotalValue / _maxValue;
         for (var i = 0; i < 5; i++)
         {
-            _stars[i].gameObject.SetActive(score >= (i / 5f));
+            _stars[i].gameObject.SetActive(score > (i / 5f));
         }
     }
 }

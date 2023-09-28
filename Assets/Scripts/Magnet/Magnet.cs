@@ -72,12 +72,16 @@ public class Magnet : MonoBehaviour
 
     private void FireOnPerformed(InputAction.CallbackContext context)
     {
+        InputTypeController.Instance.CheckInputType(context);
+
         if (GameController.Instance.State != GameState.InProgress) return;
         GrabItem(_highlightedItem);
     }
 
     private void FireOnCanceled(InputAction.CallbackContext context)
     {
+        InputTypeController.Instance.CheckInputType(context);
+
         if (GameController.Instance.State != GameState.InProgress) return;
         ReleaseCurrentItem();
     }

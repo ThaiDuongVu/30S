@@ -49,6 +49,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void MoveOnPerformed(InputAction.CallbackContext context)
     {
+        InputTypeController.Instance.CheckInputType(context);
+        
         if (GameController.Instance.State != GameState.InProgress) return;
         Move(context.ReadValue<Vector2>().normalized);
     }

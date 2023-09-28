@@ -16,8 +16,8 @@ public class Item : MonoBehaviour
     [SerializeField] private PopText damageTextPrefab;
 
     private float _currentDurability;
+    public float DurabilityPercentage => (int)(_currentDurability / baseDurability * 100f);
 
-    private SpriteRenderer _sprite;
     private DistanceJoint2D _distanceJoint;
     private Rigidbody2D _rigidbody;
 
@@ -25,7 +25,6 @@ public class Item : MonoBehaviour
 
     private void Awake()
     {
-        _sprite = GetComponentInChildren<SpriteRenderer>();
         _distanceJoint = GetComponent<DistanceJoint2D>();
         _rigidbody = GetComponent<Rigidbody2D>();
     }
@@ -55,8 +54,6 @@ public class Item : MonoBehaviour
     private void TakeDamage(float damage, Vector2 contactPoint)
     {
         _currentDurability -= damage;
-        // Update sprite visibility based on durability
-        _sprite.color = new Color(_sprite.color.r, _sprite.color.g, _sprite.color.b, _currentDurability / baseDurability);
 
         if (damage > 10f)
         {
